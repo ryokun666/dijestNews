@@ -1,0 +1,30 @@
+# ビルドディレクトリ
+.next/
+out/
+
+# Node.js関連
+node_modules/
+npm-debug.log
+yarn-error.log
+yarn-debug.log
+*.pnp.js
+.pnp/
+.cache/
+*.swp
+*.swo
+*.swn
+
+# 環境変数ファイル
+.env
+.env.local
+.env.development
+.env.production
+
+# エディター設定
+.vscode/
+.idea/
+*.sublime-workspace
+
+# OS関連
+.DS_Store
+Thumbs.db
