@@ -1,4 +1,5 @@
 import { useState, useEffect } from "react";
+import axios from "axios";
 
 const categories = [
   "ビジネス",
@@ -20,13 +21,15 @@ const countries = [
   { code: "jp", name: "日本" },
   { code: "us", name: "アメリカ" },
   { code: "gb", name: "イギリス" },
-  // 他の国を追加する場合は、ここに追記してください
+  // 他の国を追加する場合は、ここに追記
 ];
 
 export default function Home() {
   const [news, setNews] = useState([]);
   const [category, setCategory] = useState("");
   const [country, setCountry] = useState("jp");
+  // 記事取得用
+  const [articleContent, setArticleContent] = useState("");
 
   useEffect(() => {
     const fetchNews = async () => {
@@ -41,6 +44,32 @@ export default function Home() {
     };
     fetchNews();
   }, [category, country]);
+
+  // PythonとAPI連携
+  const fetchArticleContent = async (title) => {
+    console.log(title);
+
+    try {
+      console.log("記事取得中");
+      const response = await axios.get(`/api/scrape?title=${title}`);
+      console.log(response.data.text);
+      setArticleContent(response.data.text);
+    } catch (error) {
+      setArticleContent("【エラー】記事取得に失敗しました〜！");
+    }
+  };
+
+  // タイトルをPythonに送信！
+  async function sendTitlesToServer(titles) {
+    const url = "http://127.0.0.1:5000/save_titles";
+
+    try {
+      const response = await axios.post(url, { titles });
+      return response.data;
+    } catch (error) {
+      console.error("Error sending titles to server:", error);
+    }
+  }
 
   return (
     <div className="container mx-auto px-4 py-8">
@@ -72,17 +101,21 @@ export default function Home() {
       <ul>
         {news.map((article, index) => (
           <li key={index} className="mb-4">
-            <a
-              href={article.url}
-              target="_blank"
-              rel="noopener noreferrer"
+            <button
+              onClick={() => sendTitlesToServer(article.title)}
               className="text-blue-500 hover:text-blue-700"
             >
               {article.title}
-            </a>
+            </button>
           </li>
         ))}
       </ul>
+      {articleContent && (
+        <div className="mt-8">
+          <h2 className="text-2xl font-bold mb-4">記事内容</h2>
+          <p className="text-justify whitespace-pre-wrap">{articleContent}</p>
+        </div>
+      )}
     </div>
   );
 }
